@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,8 +21,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="ja">
+      <body className={cn(inter.className, 'min-h-dvh')}>
+        <header className="h-16 px-6 border-b flex items-center">
+          <Button asChild variant='ghost'>
+            <Link href='/'>Company</Link>
+          </Button>
+          <form className="flex gap-2" action={async (data:FormData) => {
+            'use server'
+            const keyword = data.get('keyword') as string;
+
+            const params = new URLSearchParams();
+            params.append('q', keyword);
+            redirect(`/search?${params.toString()}`)
+          }}>
+            <Input name="keyword" autoComplete="off" className="flex-1"/>
+            <Button type="submit" size='icon'>
+              <Search size={20}/>
+            </Button>
+          </form>
+        </header>
+        <main className="py-10">{children}</main>
+        <footer className="h-16 px-6 border-t flex items-center sticky top-full">Footer</footer>
+      </body>
     </html>
   );
 }
